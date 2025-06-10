@@ -1,0 +1,101 @@
+public abstract class dev/karamel/bitvector/BitVector : java/lang/Iterable, kotlin/jvm/internal/markers/KMappedMarker {
+	public static final field Companion Ldev/karamel/bitvector/BitVector$Companion;
+	public synthetic fun <init> ([ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun cardinality ()I
+	public final fun contains (I)Z
+	public final fun contains (Ldev/karamel/bitvector/BitVector;)Z
+	public fun copy ()Ldev/karamel/bitvector/BitVector;
+	public static final fun empty ()Ldev/karamel/bitvector/BitVector;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun first (IIZ)I
+	public final fun first (Z)I
+	public static synthetic fun first$default (Ldev/karamel/bitvector/BitVector;IIZILjava/lang/Object;)I
+	public static synthetic fun first$default (Ldev/karamel/bitvector/BitVector;ZILjava/lang/Object;)I
+	public final fun forEachBit (Lkotlin/jvm/functions/Function1;)V
+	public final fun forEachBitBreakable (ZLkotlin/jvm/functions/Function1;)V
+	public static synthetic fun forEachBitBreakable$default (Ldev/karamel/bitvector/BitVector;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public final fun forEachZeroBit (Lkotlin/jvm/functions/Function1;)V
+	public final fun forEachZeroBitBreakable (Lkotlin/jvm/functions/Function1;)V
+	public final fun get (I)Z
+	public final fun getWords ()[I
+	public fun hashCode ()I
+	public final fun intersects (Ldev/karamel/bitvector/BitVector;)Z
+	public final fun isEmpty ()Z
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/IntIterator;
+	public final fun last ()I
+	public final fun length ()I
+	protected final fun setWords ([I)V
+	public fun toString ()Ljava/lang/String;
+	public final fun unsafeGet (I)Z
+	protected final fun unsafeGet (II)Z
+}
+
+public final class dev/karamel/bitvector/BitVector$Companion {
+	public final fun empty ()Ldev/karamel/bitvector/BitVector;
+}
+
+public final class dev/karamel/bitvector/BitVectorExtensionsKt {
+	public static final fun firstOrElse (Ldev/karamel/bitvector/BitVector;I)I
+	public static final fun firstZero (Ldev/karamel/bitvector/BitVector;)I
+	public static final fun firstZero (Ldev/karamel/bitvector/BitVector;II)I
+	public static synthetic fun firstZero$default (Ldev/karamel/bitvector/BitVector;IIILjava/lang/Object;)I
+	public static final fun firstZeroOrElse (Ldev/karamel/bitvector/BitVector;I)I
+	public static final fun lastOrElse (Ldev/karamel/bitvector/BitVector;I)I
+}
+
+public final class dev/karamel/bitvector/BitVectorKt {
+	public static final field WORD_INDEX_SHIFT I
+}
+
+public final class dev/karamel/bitvector/BitVectorKtKt {
+	public static final fun bitsOf ([I)Ldev/karamel/bitvector/BitVector;
+	public static final fun mutableBitsOf ([I)Ldev/karamel/bitvector/MutableBitVector;
+}
+
+public final class dev/karamel/bitvector/BitVectorUtilsKt {
+	public static final fun filterAndMap (Ljava/util/List;Ldev/karamel/bitvector/MutableBitVector;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun filterWith (Ljava/util/List;Ldev/karamel/bitvector/MutableBitVector;I)Ljava/util/List;
+	public static synthetic fun filterWith$default (Ljava/util/List;Ldev/karamel/bitvector/MutableBitVector;IILjava/lang/Object;)Ljava/util/List;
+	public static final fun filterWithNot (Ljava/util/List;Ldev/karamel/bitvector/MutableBitVector;I)Ljava/util/List;
+	public static synthetic fun filterWithNot$default (Ljava/util/List;Ldev/karamel/bitvector/MutableBitVector;IILjava/lang/Object;)Ljava/util/List;
+	public static final fun iterateBits ([BLkotlin/jvm/functions/Function1;)V
+}
+
+public final class dev/karamel/bitvector/MutableBitVector : dev/karamel/bitvector/BitVector {
+	public static final field Companion Ldev/karamel/bitvector/MutableBitVector$Companion;
+	public fun <init> (I)V
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ldev/karamel/bitvector/BitVector;)V
+	public synthetic fun <init> ([ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun and (Ldev/karamel/bitvector/MutableBitVector;)V
+	public final fun andNot (Ldev/karamel/bitvector/MutableBitVector;)V
+	public final fun clear ()V
+	public final fun clear (II)V
+	public final fun clear (Lkotlin/ranges/IntRange;)V
+	public synthetic fun copy ()Ldev/karamel/bitvector/BitVector;
+	public fun copy ()Ldev/karamel/bitvector/MutableBitVector;
+	public final fun ensureCapacity (I)V
+	public final fun fill (Lkotlin/ranges/IntRange;)V
+	public final fun flip (I)V
+	public final fun invert (I)V
+	public final fun or (Ldev/karamel/bitvector/MutableBitVector;)V
+	public final fun put (I)Z
+	public final fun put (IZ)Z
+	public static synthetic fun put$default (Ldev/karamel/bitvector/MutableBitVector;IZILjava/lang/Object;)Z
+	public final fun set (I)V
+	public final fun set (IZ)V
+	public final fun unsafeGetAndSet (I)Z
+	public final fun unsafeGetAndUnset (I)Z
+	public final fun unsafeSet (I)V
+	public final fun unsafeSet (IZ)V
+	public final fun unsafeUnset (I)V
+	public final fun unset (I)V
+	public static final fun wrap ([I)Ldev/karamel/bitvector/MutableBitVector;
+	public final fun xor (Ldev/karamel/bitvector/MutableBitVector;)V
+}
+
+public final class dev/karamel/bitvector/MutableBitVector$Companion {
+	public final fun wrap ([I)Ldev/karamel/bitvector/MutableBitVector;
+}
+
