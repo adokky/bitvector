@@ -11,7 +11,13 @@ Based on Adrian Papari initial [implementation][original] and has been enhanced 
 
  [original]: https://github.com/junkdog/bitvector
  [long-emu]: https://kotlinlang.org/docs/reference/js-to-kotlin-interop.html#representing-kotlin-types-in-javascript
- 
+
+## Setup
+
+```kotlin
+implementation("io.github.adokky:bitvector-core:0.81")
+```
+
 ## Usage
 
 #### Constructing
@@ -22,11 +28,11 @@ val bv: BitVector = bitsOf(1, 2, 56, 64, 128, 129, 130, 131, 420)
 
 #### Individual bits
 ```kotlin
-val bv = BitVector()
+val bv = MutableBitVector()
 bv[142] = true // or bv.set(142)
 assert(142 in bv)
 
-bv.clear(142)  // or bv[142] = false
+bv.unset(142)  // or bv[142] = false
 assert(142 !in bv)
 ```
 
@@ -75,7 +81,7 @@ See [jmh-logs](https://github.com/junkdog/bitvector/tree/master/jmh-logs) for th
 
 ![benchmark.png](http://junkdog.github.io/images/bitvector-jmh.png)
 
-Discrepancy to artemis' `BitVector` is unwelcome. The implementation is for the most part the same, except that this implementation uses `int` for words, instead of `long`. 4 or 8 byte words did not have a significant impact on performance.
+Discrepancy to artemis `BitVector` is unwelcome. The implementation is for the most part the same, except that this implementation uses `int` for words, instead of `long`. 4 or 8 byte words did not have a significant impact on performance.
 
 The for-loop performs poorly due to all the `Integer` boxing, extra indirection and allocation, compared to `forEachBit`.   
 

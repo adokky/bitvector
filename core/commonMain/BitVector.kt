@@ -70,7 +70,7 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
     }
 
     /**
-     * Simmilar to [forEachBit] but stops iteration if [action] returns `true`.
+     * Similar to [forEachBit] but stops iteration if [action] returns `true`.
      */
     inline fun forEachBitBreakable(bit: Boolean = true, action: (Int) -> Boolean) {
         val words = words
@@ -90,14 +90,12 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         }
     }
 
-    /**
-     * Enumerates over all `false` bits sequentially up until number of 32-bit words.
-     */
+    /** Enumerates over all `false` bits sequentially up until number of 32-bit words */
     inline fun forEachZeroBitBreakable(f: (Int) -> Boolean) {
         forEachBitBreakable(bit = false, f)
     }
 
-    /** @return index of first [bit] */
+    /** @return index of first [bit] or -1 if there is no such [bit] */
     fun first(bit: Boolean = true): Int {
         var wordIdx = 0
 
@@ -115,7 +113,11 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         return if (bit) -1 else (words.size shl WORD_INDEX_SHIFT)
     }
 
-    /** @return index of first [bit] in range starting from [start] until [endExclusive] */
+    /**
+     * @return the index of the first [bit] that occurs
+     * in specified range starting from [start] until [endExclusive]
+     * or -1 if there is no [bit] is specified range
+     */
     fun first(start: Int, endExclusive: Int = words.size shl WORD_INDEX_SHIFT, bit: Boolean = true): Int {
         val wordStart = start.toWordIdx()
         val wordEnd = (endExclusive.toWordIdx() + 1).coerceAtMost(words.size)
@@ -143,7 +145,7 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         }
     }
 
-    /** @return last index of `true` bit */
+    /** @return last index of `true` bit or -1 if all bits are zero */
     fun last(): Int {
         var wordIdx = words.lastIndex
         while (wordIdx >= 0) {
@@ -254,23 +256,27 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other == null) return false
         if (other !is BitVector) return false
 
-        val otherBits = other.words
+        val otherWords = other.words
 
-        val commonWords = minOf(words.size, otherBits.size)
-        var i = 0
-        while (commonWords > i) {
-            if (words[i] != otherBits[i])
-                return false
-            i++
+        val short: IntArray
+        val long: IntArray
+        if (words.size > otherWords.size) {
+            short = otherWords
+            long = words
+        } else {
+            short = words
+            long = otherWords
         }
 
-        if (words.size == otherBits.size)
-            return true
+        if (!long.startsWith(short)) return false
 
-        return length() == other.length()
+        for (i in short.size ..< long.size) {
+            if (long[i] != 0) return false
+        }
+
+        return true
     }
 
     companion object {
