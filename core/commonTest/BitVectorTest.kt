@@ -1,12 +1,13 @@
 package dev.dokky.bitvector
 
+import dev.adokky.testEquality
 import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.test.*
 
 class BitVectorTest {
     @Test
-    fun test_equality() {
+    fun test_equality_simple() {
         bitsOf(
             1, 2, 4, 1230, 1323, 1324
         ) assertEquals bitsOf(
@@ -17,6 +18,21 @@ class BitVectorTest {
         bv[120] = false
 
         bitsOf(0, 1, 2, 420) assertEquals bv
+    }
+
+    @Test
+    fun test_equality_auto() {
+        testEquality {
+            requireNonIdentical = true
+            checkToString = true
+
+            group { bitsOf() }
+            group { bitsOf(1, 2, 4, 1230) }
+            group(listOf(bitsOf(1, 2, 4, 1230, 1323)))
+            group(listOf(bitsOf(1, 2, 4, 1230, 1323, 1324)))
+            group(listOf(bitsOf(1, 2, 4, 1230, 1323, 1420)))
+            group(listOf(bitsOf(0, 1, 2, 120, 420)))
+        }
     }
 
     @Test
