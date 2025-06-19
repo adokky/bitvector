@@ -250,7 +250,7 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
      * it both initially had the value `true` and the corresponding bit
      * in the bit set argument also had the value true.
      */
-    fun and(other: BitVector): BitVector {
+    infix fun and(other: BitVector): BitVector {
         val newWords = IntArray(minOf(words.size, other.words.size))
         and(words = words, destWords = newWords, otherWords = other.words)
         return MutableBitVector(newWords)
@@ -262,7 +262,7 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
      * already had the value `true` or the corresponding bit in the bit
      * set argument has the value `true`.
      */
-    fun or(other: BitVector): BitVector {
+    infix fun or(other: BitVector): BitVector {
         val newWords = IntArray(maxOf(words.size, other.words.size))
         or(words = words, destWords = newWords, otherWords = other.words)
         return MutableBitVector(newWords)
@@ -276,7 +276,7 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
      *  * The bit initially has the value `false`, and the corresponding bit in
      *    the argument has the value `true`.
      */
-    fun xor(other: BitVector): BitVector {
+    infix fun xor(other: BitVector): BitVector {
         val newWords = IntArray(maxOf(words.size, other.words.size))
         xor(words = words, destWords = newWords, otherWords = other.words)
         return MutableBitVector(newWords)
