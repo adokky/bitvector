@@ -244,6 +244,44 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         return true
     }
 
+    /**
+     * Returns the result of logical **AND** of this target bit set with the [other] bit set.
+     * Each bit in the result set is `true` if and only if
+     * it both initially had the value `true` and the corresponding bit
+     * in the bit set argument also had the value true.
+     */
+    fun and(other: BitVector): BitVector {
+        val newWords = IntArray(minOf(words.size, other.words.size))
+        and(words = words, destWords = newWords, otherWords = other.words)
+        return MutableBitVector(newWords)
+    }
+
+    /**
+     * Returns the result of logical **OR** of this bit set with the [other] bit set.
+     * Each bit in the result set is `true` if and only if it either
+     * already had the value `true` or the corresponding bit in the bit
+     * set argument has the value `true`.
+     */
+    fun or(other: BitVector): BitVector {
+        val newWords = IntArray(maxOf(words.size, other.words.size))
+        or(words = words, destWords = newWords, otherWords = other.words)
+        return MutableBitVector(newWords)
+    }
+
+    /**
+     * Returns the result of logical **XOR** of this bit set with the [other] bit set.
+     * Each result bit is `true` if and only if one of the following statements holds:
+     *  * The bit initially has the value `true`, and the corresponding bit in
+     *    the argument has the value `false`.
+     *  * The bit initially has the value `false`, and the corresponding bit in
+     *    the argument has the value `true`.
+     */
+    fun xor(other: BitVector): BitVector {
+        val newWords = IntArray(maxOf(words.size, other.words.size))
+        xor(words = words, destWords = newWords, otherWords = other.words)
+        return MutableBitVector(newWords)
+    }
+
     override fun hashCode(): Int {
         val word = length().toWordIdx()
         var hash = 0

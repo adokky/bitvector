@@ -15,7 +15,7 @@ Based on Adrian Papari initial [implementation][original] and has been enhanced 
 ## Setup
 
 ```kotlin
-implementation("io.github.adokky:bitvector-core:0.81")
+implementation("io.github.adokky:bitvector-core:0.9")
 ```
 
 ## Usage
@@ -43,13 +43,10 @@ As with `java.util.BitSet`, these operations mutate the callee. Do a `copy()` if
 These functions are not infix functions, as such syntax would suggest a value copy.
   
 ```kotlin
-val a = bitsOf(0, 1, 2, 3, 120,                130)
-val b = bitsOf(0, 1, 2,    120, 121, 122, 123, 130)
+val a = bitsOf(0, 1, 2, 3, 120, 130)
+val b = bitsOf(0, 1, 2, 120, 121, 122, 123, 130)
 
 assert(a.and(b) == bitsOf(0, 1, 2, 120, 130))
-
-// caveat: bitvector was mutated above
-assert(a == bitsOf(0, 1, 2, 120, 130))
 ```
 
 

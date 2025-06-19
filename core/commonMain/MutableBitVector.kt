@@ -8,7 +8,7 @@ import kotlin.jvm.JvmStatic
  * Performance optimized bitset implementation. Certain operations are
  * prefixed with `unsafe`; these methods perform no validation.
  */
-class MutableBitVector private constructor(words: IntArray): BitVector(words) {
+class MutableBitVector internal constructor(words: IntArray): BitVector(words) {
     constructor(initialCapacity: Int = WORD_SIZE): this(IntArray((initialCapacity / WORD_SIZE).coerceAtLeast(1)))
 
     /** Creates a bit set based off another bit vector. */
@@ -132,13 +132,13 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      * @param index the index of the bit to set
      */
     fun unsafeGetAndSet(index: Int): Boolean {
-        val wordIdx = index.toWordIdx()
+        val wi = index.toWordIdx()
 
-        val oldWord = words[wordIdx]
+        val oldWord = words[wi]
         val newWord = oldWord or (1 shl index)
 
         if (oldWord == newWord) return true
-        words[wordIdx] = newWord
+        words[wi] = newWord
         return false
     }
 
@@ -148,13 +148,13 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      * @param index the index of the bit to set
      */
     fun unsafeGetAndUnset(index: Int): Boolean {
-        val wordIdx = index.toWordIdx()
+        val wi = index.toWordIdx()
 
-        val oldWord = words[wordIdx]
+        val oldWord = words[wi]
         val newWord = oldWord and ((1 shl index).inv())
 
         if (oldWord == newWord) return false
-        words[wordIdx] = newWord
+        words[wi] = newWord
         return true
     }
 
@@ -168,9 +168,9 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
 
     /** @param index the index of the bit to flip */
     fun flip(index: Int) {
-        val word = index.toWordIdx()
-        checkCapacity(word)
-        words[word] = words[word] xor (1 shl index)
+        val wi = index.toWordIdx()
+        checkCapacity(wi)
+        words[wi] = words[wi] xor (1 shl index)
     }
 
     /**
@@ -178,17 +178,17 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      * bits. Mostly applicable when relying on the `unsafe` methods,
      * including [unsafeGet] and [unsafeUnset].
      *
-     * @param bits number of bits to accommodate
+     * @param nbits number of bits to accommodate
      */
-    fun ensureCapacity(bits: Int) {
-        checkCapacity(bits.toWordIdx())
+    fun ensureCapacity(nbits: Int) {
+        checkCapacity(nbits.toWordIdx())
     }
 
     private fun checkCapacity(wordIndex: Int) {
-        if (wordIndex >= words.size) {
-            words = IntArray(wordIndex + 1).also { a ->
-                words.forEachIndexed { idx, bits -> a[idx] = bits }
-            }
+        if (wordIndex < words.size) return
+        
+        words = IntArray(wordIndex + 1).also { a ->
+            words.forEachIndexed { idx, bits -> a[idx] = bits }
         }
     }
 
@@ -237,24 +237,8 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      * value `true` and the corresponding bit in the bit set argument
      * also had the value true.
      */
-    fun and(other: BitVector) {
-        val commonWords = minOf(words.size, other.words.size)
-        run {
-            var i = 0
-            while (commonWords > i) {
-                words[i] = words[i] and other.words[i]
-                i++
-            }
-        }
-
-        if (words.size > commonWords) {
-            var i = commonWords
-            val s = words.size
-            while (s > i) {
-                words[i] = 0
-                i++
-            }
-        }
+    fun mutateAnd(other: BitVector) {
+        and(words = words, destWords = words, otherWords = other.words)
     }
 
     /**
@@ -263,7 +247,7 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      *
      * @param other a bit set
      */
-    fun andNot(other: BitVector) {
+    fun mutateAndNot(other: BitVector) {
         val commonWords = minOf(words.size, other.words.size)
         var i = 0
         while (commonWords > i) {
@@ -281,25 +265,9 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      *
      * @param other a bit set
      */
-    fun or(other: BitVector) {
-        val commonWords = minOf(words.size, other.words.size)
-        run {
-            var i = 0
-            while (commonWords > i) {
-                words[i] = words[i] or other.words[i]
-                i++
-            }
-        }
-
-        if (commonWords < other.words.size) {
-            checkCapacity(other.words.size)
-            var i = commonWords
-            val s = other.words.size
-            while (s > i) {
-                words[i] = other.words[i]
-                i++
-            }
-        }
+    fun mutateOr(other: BitVector) {
+        checkCapacity(other.words.size)
+        or(words = words, destWords = words, otherWords = other.words)
     }
 
     /**
@@ -314,26 +282,9 @@ class MutableBitVector private constructor(words: IntArray): BitVector(words) {
      *
      * @param other
      */
-    fun xor(other: BitVector) {
-        val commonWords = minOf(words.size, other.words.size)
-
-        run {
-            var i = 0
-            while (commonWords > i) {
-                words[i] = words[i] xor other.words[i]
-                i++
-            }
-        }
-
-        if (commonWords < other.words.size) {
-            checkCapacity(other.words.size)
-            var i = commonWords
-            val s = other.words.size
-            while (s > i) {
-                words[i] = other.words[i]
-                i++
-            }
-        }
+    fun mutateXor(other: BitVector) {
+        checkCapacity(other.words.size)
+        xor(words = words, destWords = words, otherWords = other.words)
     }
 
     companion object {

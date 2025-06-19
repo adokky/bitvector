@@ -3,6 +3,8 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+
+    includeBuild("../quick-mpp")
 }
 
 rootProject.name = "bitvector"
