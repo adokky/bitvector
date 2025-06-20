@@ -15,7 +15,7 @@ Based on Adrian Papari initial [implementation][original] and has been enhanced 
 ## Setup
 
 ```kotlin
-implementation("io.github.adokky:bitvector-core:0.9")
+implementation("io.github.adokky:bitvector:0.9")
 ```
 
 ## Usage
