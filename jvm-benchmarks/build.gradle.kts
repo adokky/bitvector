@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     jmh("org.openjdk.jmh:jmh-generator-annprocess:1.37")
-    jmh(project(":bitvector-core"))
+    jmh(project(":core"))
     // https://mvnrepository.com/artifact/net.onedaybeard.artemis/artemis-odb
     jmh("net.onedaybeard.artemis:artemis-odb:2.3.0")
 }
