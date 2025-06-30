@@ -3,7 +3,7 @@ plugins {
     id("io.github.adokky.quick-publish") version "0.14"
 }
 
-version = "0.9.1"
+version = "0.9.2"
 
 dependencies {
     commonTestImplementation("io.github.adokky:equals-tester:0.1")
