@@ -1,4 +1,8 @@
-## BitVector
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.adokky/bitvector)
+[![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
+[![javadoc](https://javadoc.io/badge2/io.github.adokky/bitvector/javadoc.svg)](https://javadoc.io/doc/io.github.adokky/bitvector)
+
+# BitVector
 
 Uncompressed, dynamically resizeable bitset, similar to `java.util.BitSet`.
 - Allocation-free enumeration of set bits 
