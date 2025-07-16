@@ -3,7 +3,7 @@ package dev.dokky.bitvector
 import kotlin.collections.iterator
 import kotlin.experimental.and
 
-fun <T> List<T>.filterWith(mask: MutableBitVector, maskOffset: Int = 0): List<T> =
+fun <T> List<T>.filterWith(mask: BitVector, maskOffset: Int = 0): List<T> =
     buildList(minOf(mask.cardinality(), size)) {
         mask.forEachBitBreakable { bitIndex ->
             if (bitIndex >= this@filterWith.size) true else {
@@ -13,14 +13,14 @@ fun <T> List<T>.filterWith(mask: MutableBitVector, maskOffset: Int = 0): List<T>
         }
     }
 
-fun <T> List<T>.filterWithNot(mask: MutableBitVector, maskOffset: Int = 0): List<T> =
+fun <T> List<T>.filterWithNot(mask: BitVector, maskOffset: Int = 0): List<T> =
     buildList(minOf(mask.cardinality(), size)) {
         mask.forEachZeroBit { bitIndex ->
             add(this@filterWithNot[maskOffset + bitIndex])
         }
     }
 
-inline fun <T, R> List<T>.filterAndMap(mask: MutableBitVector, mapper: (T) -> R): List<R> =
+inline fun <T, R> List<T>.filterAndMap(mask: BitVector, mapper: (T) -> R): List<R> =
     buildList(minOf(mask.cardinality(), size)) {
         for (bitIndex in mask.iterator()) {
             if (bitIndex >= this@filterAndMap.size) break
