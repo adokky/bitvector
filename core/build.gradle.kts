@@ -1,12 +1,12 @@
 plugins {
-    id("io.github.adokky.quick-mpp") version "0.14"
-    id("io.github.adokky.quick-publish") version "0.14"
+    id("io.github.adokky.quick-mpp") version "0.22"
+    id("io.github.adokky.quick-publish") version "0.22"
 }
 
-version = "0.9.2"
+version = "0.9.3"
 
 dependencies {
-    commonTestImplementation("io.github.adokky:equals-tester:0.1")
+    commonTestImplementation("io.github.adokky:equals-tester:1.1.0")
 }
 
 mavenPublishing {
