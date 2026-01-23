@@ -1,6 +1,6 @@
 package dev.dokky.bitvector
 
-import dev.adokky.testEquality
+import dev.adokky.eqtester.testEquality
 import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.test.*
@@ -169,13 +169,10 @@ class BitVectorTest {
             val bv = MutableBitVector()
 
             repeat(1_000) {
-                val idx = Random.nextInt(bits.size)
-                if (Random.nextBoolean()) {
-                    bits[idx] = true
-                    bv[idx] = true
-                } else {
-                    bits[idx] = false
-                    bv[idx] = false
+                Random.nextInt(bits.size).also {  idx ->
+                    val v = Random.nextBoolean()
+                    bits[idx] = v
+                    bv[idx] = v
                 }
 
                 assertEquals(
@@ -198,6 +195,69 @@ class BitVectorTest {
                             .let { if (it < 0) -1 else (it + start) },
                         actual = bv.firstZero(start, end)
                     )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun cardinality_in_range() {
+        bitsOf(3, 30, 31, 37, 56).also { bits ->
+            assertEquals(5, bits.cardinality(0, 57))
+            assertEquals(4, bits.cardinality(4, 57))
+            assertEquals(4, bits.cardinality(30, 57))
+            assertEquals(3, bits.cardinality(31, 57))
+            assertEquals(2, bits.cardinality(32, 57))
+            assertEquals(1, bits.cardinality(32, 56))
+            assertEquals(0, bits.cardinality(32, 37))
+
+            assertEquals(1, bits.cardinality(30, 31))
+            assertEquals(2, bits.cardinality(30, 32))
+            assertEquals(1, bits.cardinality(31, 32))
+        }
+
+        bitsOf(0, 2, 3, 95).also { bits ->
+            assertEquals(4, bits.cardinality(0, 100))
+            assertEquals(3, bits.cardinality(0, 95))
+            assertEquals(3, bits.cardinality(0, 4))
+            assertEquals(2, bits.cardinality(1, 4))
+            assertEquals(2, bits.cardinality(2, 4))
+            assertEquals(1, bits.cardinality(3, 4))
+            assertEquals(1, bits.cardinality(0, 1))
+        }
+    }
+
+    @Test
+    fun cardinality_in_range_random() {
+        val bits = BooleanArray(64 * 32 + 1) // non-linear test time growth
+        val avgMaxRangesPerIteration = 1000  // linear test time growth
+
+        repeat(5) {
+            bits.fill(false)
+            val bv = MutableBitVector()
+
+            var prev = 0
+            repeat(bits.size * 3) {
+                Random.nextInt(bits.size).also { idx ->
+                    val v = Random.nextBoolean()
+                    bits[idx] = v
+                    bv[idx] = v
+                }
+
+                repeat(1 + ((prev * avgMaxRangesPerIteration * 2) / bits.size)) {
+                    val start = Random.nextInt(bits.size - 1)
+                    val end = Random.nextInt(start + 1, bits.size)
+
+                    var expected = 0
+                    for(i in start..<end) {
+                        expected += if (bits[i]) 1 else 0
+                    }
+
+                    val actual = bv.cardinality(start, end)
+                    if (expected != actual) {
+                        fail("expected: $expected, actual: $actual, bv: $bv, range: $start..<$end")
+                    }
+                    prev = expected
                 }
             }
         }

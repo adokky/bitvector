@@ -6,6 +6,7 @@ import kotlin.jvm.JvmStatic
 @PublishedApi
 internal const val WORD_INDEX_SHIFT: Int = 5
 internal const val WORD_SIZE: Int = 32
+internal const val WORD_MASK: Int = 0.inv().ushr(WORD_SIZE - WORD_INDEX_SHIFT)
 
 /**
  * Uncompressed, dynamically resizeable bitset, similar to `java.util.BitSet`
@@ -15,16 +16,21 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         protected set
 
     /**
+     * Retrieves the value of the bit at the specified index without bounds checking.
+     *
      * @param index the index of the bit
-     * @return whether the bit is set
+     * @return `true` if the bit is set, `false` otherwise
      */
     fun unsafeGet(index: Int): Boolean {
         return words[index.toWordIdx()] and (1 shl index) != 0
     }
 
     /**
+     * Retrieves the value of the bit at the specified index.
+     *
      * @param index the index of the bit
-     * @return whether the bit is set
+     * @return `true` if the bit is set, `false` otherwise
+     * @throws IllegalArgumentException if `index` is negative
      */
     operator fun get(index: Int): Boolean {
         require(index >= 0)
@@ -36,6 +42,7 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
     protected fun unsafeGet(wordIndex: Int, index: Int): Boolean =
         wordIndex < words.size && words[wordIndex] and (1 shl index) != 0
 
+    /** Creates a copy of this bitset. */
     open fun copy(): BitVector = MutableBitVector(this)
 
     override fun toString(): String {
@@ -71,6 +78,10 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
 
     /**
      * Similar to [forEachBit] but stops iteration if [action] returns `true`.
+     *
+     * @param bit the bit value to iterate over (`true` or `false`)
+     * @param action the action to be performed for each bit
+     * @return `true` if iteration was stopped early, `false` otherwise
      */
     inline fun forEachBitBreakable(bit: Boolean = true, action: (Int) -> Boolean) {
         val words = words
@@ -90,12 +101,21 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         }
     }
 
-    /** Enumerates over all `false` bits sequentially up until number of 32-bit words */
+    /**
+     * Enumerates over all `false` bits sequentially up until number of 32-bit words.
+     *
+     * @param f the action to be performed for each bit
+     * @return `true` if iteration was stopped early, `false` otherwise
+     */
     inline fun forEachZeroBitBreakable(f: (Int) -> Boolean) {
         forEachBitBreakable(bit = false, f)
     }
 
-    /** @return index of first [bit] or -1 if there is no such [bit] */
+    /**
+     * Returns the index of the first [bit] or -1 if there is no such [bit].
+     *
+     * @param bit the bit value to find (`true` or `false`)
+     */
     fun first(bit: Boolean = true): Int {
         var wordIdx = 0
 
@@ -114,9 +134,12 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
     }
 
     /**
-     * @return the index of the first [bit] that occurs
-     * in specified range starting from [start] until [endExclusive]
-     * or -1 if there is no [bit] is specified range
+     * Returns the index of the first [bit] that occurs in the specified range
+     * starting from [start] until [endExclusive] or -1 if there is no such [bit].
+     *
+     * @param start the start index (inclusive)
+     * @param endExclusive the end index (exclusive)
+     * @param bit the bit value to find (`true` or `false`)
      */
     fun first(start: Int, endExclusive: Int = words.size shl WORD_INDEX_SHIFT, bit: Boolean = true): Int {
         val wordStart = start.toWordIdx()
@@ -145,7 +168,9 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         }
     }
 
-    /** @return last index of `true` bit or -1 if all bits are zero */
+    /**
+     * Returns the index of the last `true` bit or -1 if all bits are zero.
+     */
     fun last(): Int {
         var wordIdx = words.lastIndex
         while (wordIdx >= 0) {
@@ -157,8 +182,14 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         return -1
     }
 
+    /**
+     * Returns an iterator over the indices of the `true` bits in this bitset.
+     */
     override fun iterator(): IntIterator = BitVectorIterator(this)
 
+    /**
+     * Checks if the bit at the specified [index] is set.
+     */
     operator fun contains(index: Int): Boolean = get(index)
 
     /** Returns the count of `true` bits */
@@ -167,6 +198,33 @@ sealed class BitVector(words: IntArray): Iterable<Int> {
         for (i in words.indices)
             count += words[i].countOneBits()
 
+        return count
+    }
+
+    /**
+     * Returns the count of `true` bits in the specified range starting from [start] until [endExclusive].
+     *
+     * @param start the start index (inclusive)
+     * @param endExclusive the end index (exclusive)
+     * @return the number of `true` bits in the specified range
+     */
+    fun cardinality(start: Int, endExclusive: Int = Int.MAX_VALUE): Int {
+        if (start >= endExclusive) return 0
+
+        val wordStart = start.toWordIdx()
+        val wordEndIndex = (endExclusive - 1).toWordIdx()
+        val wordEnd = wordEndIndex.coerceAtMost(words.size - 1)
+
+        val firstMask = 0.inv().shl(start)
+        val endMask = 0.inv().ushr(WORD_SIZE - endExclusive)
+
+        var count = 0
+        for (widx in wordStart..wordEnd) {
+            var w = words[widx]
+            if (widx == wordStart) w = w and firstMask
+            if (widx == wordEndIndex) w = w and endMask
+            count += w.countOneBits()
+        }
         return count
     }
 
